@@ -6,7 +6,7 @@ export default function StudyList({ items, onSelect, selectedId }) {
           <li
             key={item.id}
             className={item.id === selectedId ? 'active' : ''}
-            style={{ border: '1px solid #ccc', borderRadius: '5px', listStyle: 'none' }}
+            style={{ border: '1px solid #ccc', borderRadius: '5px', margin: '20px 0', listStyle: 'none' }}
             onClick={() => onSelect(item.id)}
           >
             <h3>
