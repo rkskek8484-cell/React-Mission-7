@@ -17,8 +17,8 @@ function App() {
 
   const [category, setCategory] = useState('all');
   const filteredItems = reactData
-    .fiter((item) => (category === 'all' ? true : item.category === category))
-    .fiter((item) => item.title.toLowerCase().includes(keyword.toLowerCase()));
+    .filter((item) => (category === 'all' ? true : item.category === category))
+    .filter((item) => item.title.toLowerCase().includes(keyword.toLowerCase()));
 
   const [keyword, setKeyword] = useState('');
 
