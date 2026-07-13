@@ -14,13 +14,12 @@ function App() {
   const onSelect = (id) => {
     setSelectedId(id);
   };
+  const [keyword, setKeyword] = useState('');
 
   const [category, setCategory] = useState('all');
   const filteredItems = reactData
     .filter((item) => (category === 'all' ? true : item.category === category))
-    .filter((item) => item.title.toLowerCase().includes(keyword.toLowerCase()));
-
-  const [keyword, setKeyword] = useState('');
+    .filter((item) => item.title.includes(keyword));
 
   return (
     <>
