@@ -1,25 +1,36 @@
 import './App.css';
 import reactData from './data/data.json';
-import StudyInfo from './components/StudyInfo';
+
 import StudyList from './components/StudyList';
 import SearchForm from './components/SearchForm';
 import CategoryFilter from './components/CategoryFilter';
-import { useState } from 'react';
+import StudySummary from './components/StudySummary';
+import { useState, useMemo, useCallback } from 'react';
 
 console.log(reactData);
 console.log(reactData[0]);
 
 function App() {
-  const dataFirst = reactData[0];
-
   const [selectedId, setSelectedId] = useState(null);
   const [keyword, setKeyword] = useState('');
-  const [favoriteIds, setFavoriteIds] = useState('');
   const [category, setCategory] = useState('all');
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [favoriteOnly, setFavoriteOnly] = useState(false);
 
-  const filteredItems = reactData
-    .filter((item) => (category === 'all' ? true : item.category === category))
-    .filter((item) => item.title.toLowerCase().includes(keyword.toLowerCase()));
+  const filteredData = useMemo(() => {
+    return reactData
+      .filter((item) => (category === 'all' ? true : item.category === category))
+      .filter((item) => item.title.toLowerCase().includes(keyword.toLowerCase()))
+      .filter((item) => (favoriteOnly ? favoriteIds.includes(item.id) : true));
+  }, [keyword, category, favoriteOnly, favoriteIds]);
+
+  const summary = useMemo(() => {
+    return {
+      total: reactData.length,
+      visible: filteredData.length,
+      favorite: favoriteIds.length,
+    };
+  }, [filteredData, favoriteIds]);
 
   const onChange = (e) => {
     setKeyword(e.target.value);
@@ -29,24 +40,44 @@ function App() {
     setCategory(c);
   };
 
+  const handleToggleFavorite = useCallback((id) => {
+    setFavoriteIds((prev) => (prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]));
+  }, []);
+
   const onSelect = (id) => {
     setSelectedId(id);
+  };
+
+  const handleReset = () => {
+    setKeyword('');
+    setCategory('all');
+    setFavoriteOnly(false);
   };
 
   return (
     <>
       <p>React Basic Review Mission 8</p>
       <h1>React Hooks 학습 목록 관리</h1>
-      {/* <p>전체 학습 항목 수 {reactData.length}개</p> */}
-      <p>useState, useMemo, useCallback, useRef를 활용한 복습 미션입니다.</p>
-      <SearchForm onChange={onChange} value={keyword} />
-      {/* <StudyInfo title={dataFirst.title} desc={dataFirst.desc} category={dataFirst.category} /> */}
-      <CategoryFilter onClick={handleCategoryChange} category={category} />
 
+      <p>useState, useMemo, useCallback, useRef를 활용한 복습 미션입니다.</p>
+      <SearchForm onChange={onChange} value={keyword} handleReset={handleReset} />
+
+      <CategoryFilter
+        onClick={handleCategoryChange}
+        category={category}
+        favoriteIds={favoriteIds}
+        favoriteOnly={favoriteOnly}
+      />
       <div>
-        <button style={{ display: 'flex', flexDirection: 'start', margin: '5px 0' }}>즐겨찾기만 보기</button>
+        <button
+          style={{ display: 'flex', flexDirection: 'start', margin: '5px 0' }}
+          onClick={() => setFavoriteOnly(!favoriteOnly)}
+        >
+          {favoriteOnly ? '전체 항목 보기' : '즐겨찾기만 보기'}
+        </button>
       </div>
-      <StudyList items={filteredItems} onSelect={onSelect} selectedId={selectedId} />
+      <StudySummary items={summary} />
+      <StudyList items={filteredData} favoriteIds={favoriteIds} onToggleFavorite={handleToggleFavorite} />
     </>
   );
 }

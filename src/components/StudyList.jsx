@@ -1,28 +1,35 @@
-export default function StudyList({ items, onSelect, selectedId }) {
-  const handleFavorit = () => {};
+import StudyItem from './StudyItem';
 
+export default function StudyList({ items, favoriteIds, onToggleFavorite }) {
+  const isFavorite = favoriteIds.includes(items.id);
+
+  if (items.length === 0) {
+    return (
+      <div
+        style={{
+          padding: '30px',
+          textAlign: 'center',
+          color: 'silver',
+          border: '1px dashed #ccc',
+          borderRadius: '6px',
+          margin: '15px 0',
+        }}
+      >
+        조건에 맞는 학습 항목이 없습니다.
+      </div>
+    );
+  }
   return (
     <div>
-      <ul style={{}}>
+      <h2>학습 목록</h2>
+      <ul>
         {items.map((item) => (
-          <li
+          <StudyItem
             key={item.id}
-            className={item.id === selectedId ? 'active' : ''}
-            style={{ border: '1px solid #ccc', borderRadius: '5px', margin: '20px 0', listStyle: 'none' }}
-            onClick={() => onSelect(item.id)}
-          >
-            <h3>
-              {item.id}. {item.title}
-            </h3>
-            <p>{item.desc}</p>
-            <p>
-              분류: {item.category} / 난이도: {item.level}
-            </p>
-            {/* {item.id === selectedId && <strong>선택된 항목입니다.</strong>} */}
-            <button style={{ margin: '20px 0' }} onClick={handleFavorit}>
-              즐겨찾기
-            </button>
-          </li>
+            item={item}
+            isFavorite={favoriteIds.includes(item.id)}
+            onToggleFavorite={onToggleFavorite}
+          />
         ))}
       </ul>
     </div>
